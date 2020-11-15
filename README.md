@@ -1,6 +1,6 @@
 # Rebit Audio Widget - Django Fullstack App
 
-This is an Audio Widget for Rebit by Ad-Auris. This customized solution is full stack with key data analytics.
+This is Ad-Auris's Audio Widget File System that makes storing all files to Google Storage SDK easy.
 
 ## Installation
 
@@ -28,8 +28,9 @@ Ensure that app.debug = False for production and app.debug = True during local d
    python manage.py runserver - locally host with hot-reload on save
    
    For anychanges to database, users, admin.py, settings.py, and a new app run these commands.
+python manage.py makemigrations
    python manage.py migrate 
-   python manage.py makemigrations
+  
     
     
 ```
@@ -45,6 +46,7 @@ Ensure that app.debug = False for production and app.debug = True during local d
 
 ```bash    
     app.debug = True
+    AllowedHosts =[] Insert domain for debug False
     
     
 ```
@@ -55,9 +57,9 @@ Ensure that app.debug = False for production and app.debug = True during local d
 ```python
 
 
-Audio Player
-Backend that serves the necessary audio files
-Google Tag Manager and Google Analytics Integration (Outside of this package)
+Google Storage
+Google Client OAuth
+
 ```
 
 ## Contributing
