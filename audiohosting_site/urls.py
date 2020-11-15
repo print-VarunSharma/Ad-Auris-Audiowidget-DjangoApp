@@ -27,12 +27,15 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from audioApp.views import (
     IndexView,
     audioWidgetTest,
+    rebit_2,
+    Home
    
 )
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', IndexView.as_view(), name='home'),
+    path('', Home.as_view(), name='home'),
     # Audio Widget Views
     path('audiowidget/', audioWidgetTest.as_view(), name='rebit-widget'),
+    path('rebit_2/', rebit_2.as_view(), name='rebit_2'),
     
 ]

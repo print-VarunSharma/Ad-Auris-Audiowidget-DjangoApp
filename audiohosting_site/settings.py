@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'audioApp',
+    'storages'
+    
 ]
 
 MIDDLEWARE = [
@@ -88,16 +91,25 @@ POSTGRES_USER = os.getenv("POSTGRES_USER", default="")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", default="")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", default="")
 
+
+# if DEBUG:
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": POSTGRES_DB,
-        "USER": 'postgres',
-        "PASSWORD": POSTGRES_PASSWORD,
-        "HOST": 'localhost',
-        "PORT": 5433,
-    }
-}
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }    
+# else:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.postgresql",
+#             "NAME": POSTGRES_DB,
+#             "USER": 'postgres',
+#             "PASSWORD": POSTGRES_PASSWORD,
+#             "HOST": 'localhost',
+#             "PORT": 5433,
+#         }
+#     }
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -130,26 +142,81 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-# DEBUG STATIC
+# Data + Storage  - Local and Production
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-)
+        os.path.join(BASE_DIR, 'templates'),
+    )
 STATICFILES_DIRS = (
-     os.path.join(BASE_DIR, 'static'),
-)
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
- # Static to prod
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_DIR = os.path.join(BASE_DIR, 'audioApp/media')
+        os.path.join(BASE_DIR, 'static'),
+    )
 
- # Static to production
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static_in_env')]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'audioApp/staticfiles')
+# for local environment
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# if DEBUG == True:
+# # Static files (CSS, JavaScript, Images)
+# # https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+# # DEBUG STATIC
+    
+#     STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+#     STATIC_URL = '/static/'
+#     MEDIA_URL = '/media/'
+#     # Static to prod
+#     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#     MEDIA_DIR = os.path.join(BASE_DIR, 'audioApp/media')
+
+#     # Static to production
+#     # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static_in_env')]
+#     # STATIC_ROOT = os.path.join(BASE_DIR, 'audioApp/staticfiles')
+
+#     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+#      
+
+
+#     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    
+#     # STATIC_ROOT = 'static/'
+#     # STATIC_URL = '/static/'
+    
+#     # MEDIA_ROOT = STATIC_ROOT + 'media'
+#     # MEDIA_URL = STATIC_URL + 'media/'
+    
+#     UPLOAD_ROOT = 'uploads/'
+    
+#     DOWNLOAD_URL = STATIC_URL + "media/downloads"
+#     DOWNLOAD_ROOT = os.path.join(PROJECT_ROOT, "static/media/downloads")
+# for prod environment
+
+# Google Storage Settings 
+from google.oauth2 import service_account
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
+# GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+#     os.path.join(BASE_DIR, "ad-auris-tts-app-6b66a8f8cdfe.json")
+# )
+
+
+# if DEBUG == True or False: 
+from django.core.files.storage import default_storage
+PROJECT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+
+GS_PROJECT_ID = os.getenv("GS_PROJECT_ID")
+GS_STATIC_BUCKET_NAME = os.getenv("GS_STATIC_BUCKET_NAME")
+GS_MEDIA_BUCKET_NAME = os.getenv("GS_MEDIA_BUCKET_NAME")
+
+STATIC_URL = 'https://storage.googleapis.com/{}/'.format(GS_STATIC_BUCKET_NAME)
+STATIC_ROOT = "static/"
+
+MEDIA_URL = 'https://storage.googleapis.com/{}/'.format(GS_MEDIA_BUCKET_NAME)
+MEDIA_ROOT = "media/"
+
+UPLOAD_ROOT = 'media/uploads/'
+
+DOWNLOAD_ROOT = os.path.join(PROJECT_ROOT, "static/media/downloads")
+DOWNLOAD_URL = STATIC_URL + "media/downloads"
+
+django_heroku.settings(locals())

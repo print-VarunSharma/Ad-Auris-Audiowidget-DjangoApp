@@ -27,3 +27,15 @@ class IndexView(View):
     
     def index(request):
         return render(request, 'index.html', context)
+
+class rebit_2(TemplateView):
+    template_name = 'widget_analytics.html'
+
+    def rebit_2(request):
+        return render(request, 'rebit_2.html', context)
+
+class Home(TemplateView):
+    template_name = 'home.html'
+
+    def home(request):
+        return render(request, 'home.html', context)
